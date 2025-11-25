@@ -1,0 +1,1693 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>業務効率化診断・改善計画ツール</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #581c87 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .nav {
+            display: flex;
+            background: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+            overflow-x: auto;
+        }
+
+        .nav-button {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-button:hover {
+            background: #e0f2fe;
+            color: #0284c7;
+        }
+
+        .nav-button.active {
+            color: #2563eb;
+            border-bottom-color: #2563eb;
+            background: white;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1e40af;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #dbeafe;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .input-group input,
+        .input-group select,
+        .input-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .input-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .button {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+        }
+
+        .button:active {
+            transform: translateY(0);
+        }
+
+        .button-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            box-shadow: none;
+        }
+
+        .button-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        .card {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-weight: 600;
+            color: #1e40af;
+            font-size: 16px;
+        }
+
+        .checkbox-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            margin-right: 10px;
+            margin-top: 4px;
+        }
+
+        .checkbox-item label {
+            flex: 1;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1e40af;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .tool-recommendation {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #f59e0b;
+            margin-bottom: 15px;
+        }
+
+        .tool-recommendation h4 {
+            color: #92400e;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .tool-recommendation p {
+            color: #78350f;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .table th,
+        .table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px;
+        }
+
+        .table th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .table tr:hover {
+            background: #f8fafc;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e5e7eb;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 15px;
+            }
+
+            .nav-button {
+                font-size: 12px;
+                padding: 12px 8px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .checkbox-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // localStorageのヘルパー関数
+        const storage = {
+            getItem: (key) => {
+                try {
+                    return localStorage.getItem(key);
+                } catch (e) {
+                    console.warn('localStorage access failed:', e);
+                    return null;
+                }
+            },
+            setItem: (key, value) => {
+                try {
+                    localStorage.setItem(key, value);
+                } catch (e) {
+                    console.warn('localStorage write failed:', e);
+                }
+            }
+        };
+
+        // データ定義
+        const workloadLevels = [
+            { value: 'light', label: '軽い', description: 'ルーチン作業、負担が少ない' },
+            { value: 'normal', label: '普通', description: '通常の業務負荷' },
+            { value: 'heavy', label: '重い', description: '集中力・判断力が必要' },
+            { value: 'very_heavy', label: '非常に重い', description: '高度なスキル・責任が必要' }
+        ];
+
+        const businessTypes = [
+            { value: 'routine', label: '定型・繰返し型', description: '業務内容・処理方法が固定的' },
+            { value: 'judgment', label: '判断型', description: '知識・情報・経験をもとに判断が必要' },
+            { value: 'cross_department', label: '部門横断型', description: '組織をまたがった調整が必要' },
+            { value: 'project', label: 'プロジェクト型', description: '企画的要素があり、繰返し性が少ない' }
+        ];
+
+        const problems = [
+            { id: 1, text: '部門で実施している業務項目が見えない', type: 'M' },
+            { id: 2, text: '業務分担が見えない（不明確）', type: 'M' },
+            { id: 3, text: '業務量が分からない', type: 'M' },
+            { id: 4, text: '業務の発生タイミングが分からない', type: 'M' },
+            { id: 5, text: '担当者が保有しているスキルレベルが見えない', type: 'M' },
+            { id: 6, text: '業務が属人化している', type: 'U' },
+            { id: 7, text: '業務が特定の人に集中している', type: 'U' },
+            { id: 8, text: '特定の時期に業務量が集中しているが、人的リソースが足りない', type: 'U' },
+            { id: 9, text: '正社員がする必要がない業務を正社員が行っている', type: 'U' },
+            { id: 10, text: 'ベテラン社員がする必要がない業務をベテラン社員が行っている', type: 'U' },
+            { id: 11, text: '業務目的が不明確な業務がある', type: 'M' },
+            { id: 12, text: '求められるアウトプットが不明確な業務がある', type: 'M' },
+            { id: 13, text: '業務のやり方が決まっていない（担当者任せ）', type: 'M' },
+            { id: 14, text: '業務を行う上での判断基準が不明確', type: 'M' },
+            { id: 15, text: '手入力など手作業が多い', type: 'M' },
+            { id: 16, text: 'チェック回数が多く、チェックに多くの工数がかかる', type: 'M' },
+            { id: 17, text: '押印（承認）回数が多く、押印（承認）行為に多くの工数・リードタイムがかかる', type: 'M' },
+            { id: 18, text: 'システム連携やシステム機能が不十分', type: 'M' },
+            { id: 19, text: '前工程が終えるのを待っており、手待ちが発生する', type: 'M' },
+            { id: 20, text: '同じ業務を複数人が担当しているが、生産性・品質にバラつきがある', type: 'P' },
+            { id: 21, text: '業務マニュアルがない・不十分', type: 'M' },
+            { id: 22, text: '定時前の時間に業務が発生するため、残業になっている', type: 'M' },
+            { id: 23, text: '顧客ごとの個別対応が発生しており、手間がかかっている', type: 'M' },
+            { id: 24, text: '例外処理が多い', type: 'M' },
+            { id: 25, text: '事務所レイアウトが業務の流れと合っていない', type: 'M' },
+            { id: 26, text: '業務ミスが多い（自責ミス）', type: 'P' },
+            { id: 27, text: '特定の人の業務ミスが多い（自責ミス）', type: 'P' },
+            { id: 28, text: '前工程部門の業務ミスが多い（他責ミス）', type: 'M' },
+            { id: 29, text: '業務ミスは少ないが、発生した際の影響度が大きい', type: 'M' },
+            { id: 30, text: '資料作成のスキル不足により、必要以上に工数がかかっている', type: 'P' },
+            { id: 31, text: '資料作成の手戻りが多い', type: 'M' },
+            { id: 32, text: '資料フォーマットがバラバラになっており、必要以上に工数がかかっている', type: 'M' },
+            { id: 33, text: '会議にかける時間が多い', type: 'M' },
+            { id: 34, text: '目的が不明確な会議がある', type: 'M' },
+            { id: 35, text: '会議が予定時間通りに始まらない・終わらない', type: 'M' },
+            { id: 36, text: 'メール（書く・読む・探す）時間が多い', type: 'M' },
+            { id: 37, text: '1日のメール件数が多く、メールチェックに多くの時間がかかる', type: 'M' },
+            { id: 38, text: 'メール本文が簡潔でなく、書く・読むに時間がかかる', type: 'M' },
+            { id: 39, text: '個人の業務スキルが低いため、多くの工数がかかっている', type: 'P' },
+            { id: 40, text: '個人の基礎スキル（PCスキル等）が低いため、多くの工数がかかっている', type: 'P' },
+            { id: 41, text: '必要な紙のファイルをすぐに取り出せず、探すのに時間がかかる', type: 'M' },
+            { id: 42, text: '必要な電子ファイルをすぐに取り出せず、探すのに時間がかかる', type: 'M' },
+            { id: 43, text: '過去ファイルを活用する等で、部門に蓄積されたナレッジを活用できていない', type: 'M' },
+            { id: 44, text: '突発作業が多く、計画的に仕事を進められていない', type: 'M' },
+            { id: 45, text: 'チームメンバーの作業内容・作業進捗・作業結果が見えない（分からない）', type: 'M' },
+            { id: 46, text: '時間あたり生産性を意識して働くことができていない', type: 'P' },
+            { id: 47, text: '管理職のプレイヤー時間が多く、チームマネジメントが十分にできていない', type: 'U' },
+            { id: 48, text: '異動が多く、引継ぎのために生産性が大きく落ちている', type: 'M' },
+            { id: 49, text: '顧客や現場などオフィス外に居る時間を増やしたいが、オフィス内での事務作業が多い', type: 'M' },
+            { id: 50, text: '部門で抱えている問題点が整理されて見えていない', type: 'M' }
+        ];
+
+        const itTools = [
+            {
+                name: 'RPA',
+                businessType: 'routine',
+                description: '人がPCで行う定型作業をロボットソフトに記憶させることで、人のオペレーションを代替',
+                benefits: ['定型作業の効率化', '夜間処理によるリードタイム短縮', 'ミスの削減']
+            },
+            {
+                name: 'マクロ/VBA',
+                businessType: 'routine',
+                description: 'Excel内の複数の操作を自動化する機能',
+                benefits: ['Excel作業の効率化', '繰り返し処理の自動化']
+            },
+            {
+                name: 'OCR',
+                businessType: 'routine',
+                description: 'PDF等の画像データのテキスト部分を認識し、文字データに変換',
+                benefits: ['紙からのデータ入力作業削減', 'ペーパレス化', '在庫削減']
+            },
+            {
+                name: 'ルールエンジン',
+                businessType: 'judgment',
+                description: '業務知識をルールベースとして蓄積し、高度な意思決定を自動化',
+                benefits: ['判断業務の自動化', 'ノウハウの形式知化']
+            },
+            {
+                name: 'チャットボット',
+                businessType: 'judgment',
+                description: 'ロボットがチャット上で自動会話を行うツール',
+                benefits: ['問合せ対応の効率化', '24時間対応', '顧客満足度向上']
+            },
+            {
+                name: 'IoT',
+                businessType: 'judgment',
+                description: 'モノがインターネットにつながり、遠隔から監視・操作・制御',
+                benefits: ['リアルタイム監視', '自動記録', '異常検知']
+            },
+            {
+                name: 'グループウェア',
+                businessType: 'cross_department',
+                description: '情報共有、コミュニケーション、業務効率化を支援',
+                benefits: ['情報共有化', 'コミュニケーション活発化', 'リモートワーク対応']
+            },
+            {
+                name: 'ノーコード/ローコードアプリ開発',
+                businessType: 'cross_department',
+                description: 'プログラミング不要または少量のコードで業務アプリを開発',
+                benefits: ['情報一元化', 'Excel管理からの脱却', '部門間連携強化']
+            },
+            {
+                name: 'ワークフローシステム',
+                businessType: 'cross_department',
+                description: '申請内容に応じた承認ルート、承認方法で承認・決裁',
+                benefits: ['承認フロー速度向上', '業務フロー標準化', 'テレワーク対応']
+            },
+            {
+                name: 'BI（ビジネスインテリジェンス）',
+                businessType: 'project',
+                description: '様々なデータを分析・見える化し、意思決定を支援',
+                benefits: ['集計作業の効率化', 'リアルタイムデータ確認', '意思決定スピード向上']
+            },
+            {
+                name: '生成AI',
+                businessType: 'project',
+                description: 'テキスト、画像等のコンテンツやアイデアを自律的に生成',
+                benefits: ['情報収集の効率化', '仮説立案支援', '文章作成支援']
+            }
+        ];
+
+        // メインアプリケーション
+        function App() {
+            const [activeTab, setActiveTab] = useState('home');
+            const [tasks, setTasks] = useState([]);
+            const [selectedProblems, setSelectedProblems] = useState([]);
+            const [improvements, setImprovements] = useState([]);
+            const [storageAvailable, setStorageAvailable] = useState(true);
+            
+            // ローカルストレージから読み込み
+            useEffect(() => {
+                try {
+                    const savedTasks = storage.getItem('businessTasks');
+                    const savedProblems = storage.getItem('selectedProblems');
+                    const savedImprovements = storage.getItem('improvements');
+                    
+                    if (savedTasks) setTasks(JSON.parse(savedTasks));
+                    if (savedProblems) setSelectedProblems(JSON.parse(savedProblems));
+                    if (savedImprovements) setImprovements(JSON.parse(savedImprovements));
+                    setStorageAvailable(true);
+                } catch (e) {
+                    console.warn('Failed to load from storage:', e);
+                    setStorageAvailable(false);
+                }
+            }, []);
+
+            // データ保存
+            useEffect(() => {
+                if (tasks.length > 0) {
+                    storage.setItem('businessTasks', JSON.stringify(tasks));
+                }
+            }, [tasks]);
+
+            useEffect(() => {
+                if (selectedProblems.length > 0) {
+                    storage.setItem('selectedProblems', JSON.stringify(selectedProblems));
+                }
+            }, [selectedProblems]);
+
+            useEffect(() => {
+                if (improvements.length > 0) {
+                    storage.setItem('improvements', JSON.stringify(improvements));
+                }
+            }, [improvements]);
+
+            return (
+                <div className="container">
+                    <div className="header">
+                        <h1>📊 業務効率化診断・改善計画ツール</h1>
+                        <p>業務の見える化から改善計画立案までを支援します</p>
+                    </div>
+                    
+                    <div className="nav">
+                        <button 
+                            className={`nav-button ${activeTab === 'home' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('home')}
+                        >
+                            🏠 ホーム
+                        </button>
+                        <button 
+                            className={`nav-button ${activeTab === 'tasks' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('tasks')}
+                        >
+                            📋 業務棚卸し
+                        </button>
+                        <button 
+                            className={`nav-button ${activeTab === 'problems' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('problems')}
+                        >
+                            🔍 問題点診断
+                        </button>
+                        <button 
+                            className={`nav-button ${activeTab === 'tools' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('tools')}
+                        >
+                            🛠️ ITツール推奨
+                        </button>
+                        <button 
+                            className={`nav-button ${activeTab === 'analysis' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('analysis')}
+                        >
+                            📊 自動診断
+                        </button>
+                        <button 
+                            className={`nav-button ${activeTab === 'plan' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('plan')}
+                        >
+                            📝 改善計画
+                        </button>
+                    </div>
+
+                    <div className="content">
+                        {!storageAvailable && (
+                            <div className="alert alert-info" style={{ marginBottom: '20px' }}>
+                                ⚠️ ブラウザのストレージ機能が制限されています。データは保存されませんが、ツールは正常に動作します。
+                            </div>
+                        )}
+                        {activeTab === 'home' && <HomeTab tasks={tasks} selectedProblems={selectedProblems} improvements={improvements} setActiveTab={setActiveTab} />}
+                        {activeTab === 'tasks' && <TasksTab tasks={tasks} setTasks={setTasks} />}
+                        {activeTab === 'problems' && <ProblemsTab selectedProblems={selectedProblems} setSelectedProblems={setSelectedProblems} />}
+                        {activeTab === 'analysis' && <AnalysisTab tasks={tasks} selectedProblems={selectedProblems} />}
+                        {activeTab === 'tools' && <ToolsTab tasks={tasks} />}
+                        {activeTab === 'plan' && <PlanTab improvements={improvements} setImprovements={setImprovements} selectedProblems={selectedProblems} />}
+                    </div>
+                </div>
+            );
+        }
+
+        // ホームタブ
+        function HomeTab({ tasks, selectedProblems, improvements, setActiveTab }) {
+            const totalHours = tasks.reduce((sum, task) => sum + task.hours, 0);
+            const problemCount = selectedProblems.length;
+            const improvementCount = improvements.length;
+            
+            const progress = Math.min(
+                ((tasks.length > 0 ? 25 : 0) + 
+                (problemCount > 0 ? 25 : 0) + 
+                (improvementCount > 0 ? 50 : 0)), 
+                100
+            );
+
+            return (
+                <div>
+                    <div className="section">
+                        <h2 className="section-title">進捗状況</h2>
+                        <div className="progress-bar">
+                            <div className="progress-fill" style={{ width: `${progress}%` }}>
+                                {progress}%
+                            </div>
+                        </div>
+                        <p style={{ fontSize: '14px', color: '#64748b', marginTop: '10px' }}>
+                            業務効率化の取り組み状況を確認しましょう
+                        </p>
+                    </div>
+
+                    <div className="stats-grid">
+                        <div className="stat-card">
+                            <div className="stat-value">{tasks.length}</div>
+                            <div className="stat-label">登録業務数</div>
+                        </div>
+                        <div className="stat-card">
+                            <div className="stat-value">{Math.round(totalHours)}</div>
+                            <div className="stat-label">年間総業務時間（時間）</div>
+                        </div>
+                        <div className="stat-card">
+                            <div className="stat-value">{problemCount}</div>
+                            <div className="stat-label">特定された問題点</div>
+                        </div>
+                        <div className="stat-card">
+                            <div className="stat-value">{improvementCount}</div>
+                            <div className="stat-label">改善計画数</div>
+                        </div>
+                    </div>
+
+                    <div className="section">
+                        <h2 className="section-title">使い方</h2>
+                        <div className="card">
+                            <h3 style={{ marginBottom: '15px', color: '#1e40af' }}>📋 STEP1: 業務棚卸し</h3>
+                            <p style={{ fontSize: '14px', lineHeight: '1.8', color: '#374151' }}>
+                                まず「業務棚卸し」タブで、現在行っている業務を登録します。業務名、年間業務時間、業務タイプなどを入力してください。
+                            </p>
+                        </div>
+                        <div className="card">
+                            <h3 style={{ marginBottom: '15px', color: '#1e40af' }}>🔍 STEP2: 問題点診断</h3>
+                            <p style={{ fontSize: '14px', lineHeight: '1.8', color: '#374151' }}>
+                                「問題点診断」タブで、50の不具合現象チェックリストから該当する問題点を選択します。
+                            </p>
+                        </div>
+                        <div className="card">
+                            <h3 style={{ marginBottom: '15px', color: '#1e40af' }}>📊 STEP3: 自動診断</h3>
+                            <p style={{ fontSize: '14px', lineHeight: '1.8', color: '#374151' }}>
+                                「自動診断」タブで、登録した業務データを自動分析し、業務時間の適正性、業務タイプ・負荷のバランス、高負荷業務の抽出、具体的な改善提案を表示します。
+                            </p>
+                        </div>
+                        <div className="card">
+                            <h3 style={{ marginBottom: '15px', color: '#1e40af' }}>🛠️ STEP4: ITツール推奨</h3>
+                            <p style={{ fontSize: '14px', lineHeight: '1.8', color: '#374151' }}>
+                                登録した業務の特性に応じて、適切なITツールを提案します。
+                            </p>
+                        </div>
+                        <div className="card">
+                            <h3 style={{ marginBottom: '15px', color: '#1e40af' }}>📝 STEP5: 改善計画立案</h3>
+                            <p style={{ fontSize: '14px', lineHeight: '1.8', color: '#374151' }}>
+                                問題点に対する改善アイデアを記録し、改善計画を立案します。
+                            </p>
+                        </div>
+                    </div>
+
+                    {tasks.length > 0 && (
+                        <div className="section">
+                            <h2 className="section-title">🚀 次のアクション</h2>
+                            <div className="card" style={{ background: 'linear-gradient(135deg, #dbeafe, #bfdbfe)', border: 'none' }}>
+                                <h3 style={{ fontSize: '16px', marginBottom: '10px', color: '#1e40af' }}>
+                                    ✨ 業務データが登録されました！
+                                </h3>
+                                <p style={{ fontSize: '14px', lineHeight: '1.8', color: '#1e3a8a', marginBottom: '15px' }}>
+                                    「📊 自動診断」タブで、詳細な分析レポートと改善提案を確認できます。
+                                </p>
+                                <button 
+                                    className="button"
+                                    onClick={() => setActiveTab('analysis')}
+                                    style={{ background: 'linear-gradient(135deg, #2563eb, #7c3aed)' }}
+                                >
+                                    📊 自動診断を実行する
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // 業務棚卸しタブ
+        function TasksTab({ tasks, setTasks }) {
+            const [taskName, setTaskName] = useState('');
+            const [timePerTask, setTimePerTask] = useState('');
+            const [frequency, setFrequency] = useState('daily');
+            const [frequencyCount, setFrequencyCount] = useState('');
+            const [businessType, setBusinessType] = useState('routine');
+            const [workload, setWorkload] = useState('normal');
+
+            const addTask = () => {
+                if (!taskName || !timePerTask || !frequencyCount) {
+                    alert('すべての項目を入力してください');
+                    return;
+                }
+
+                const multiplier = {
+                    'daily': 230,
+                    'weekly': 50,
+                    'monthly': 12,
+                    'yearly': 1
+                }[frequency];
+
+                const annualHours = (parseFloat(timePerTask) / 60) * parseFloat(frequencyCount) * multiplier;
+
+                const newTask = {
+                    id: Date.now(),
+                    name: taskName,
+                    timePerTask: parseFloat(timePerTask),
+                    frequency,
+                    frequencyCount: parseFloat(frequencyCount),
+                    businessType,
+                    workload,
+                    hours: annualHours
+                };
+
+                setTasks([...tasks, newTask]);
+                
+                // フォームをリセット
+                setTaskName('');
+                setTimePerTask('');
+                setFrequencyCount('');
+            };
+
+            const deleteTask = (id) => {
+                if (confirm('この業務を削除してもよろしいですか？')) {
+                    setTasks(tasks.filter(task => task.id !== id));
+                }
+            };
+
+            const totalHours = tasks.reduce((sum, task) => sum + task.hours, 0);
+
+            return (
+                <div>
+                    <div className="section">
+                        <h2 className="section-title">業務の登録</h2>
+                        <div className="card">
+                            <div className="input-group">
+                                <label>業務名 *</label>
+                                <input 
+                                    type="text" 
+                                    placeholder="例：売上データの分析と報告書作成"
+                                    value={taskName}
+                                    onChange={(e) => setTaskName(e.target.value)}
+                                />
+                            </div>
+                            
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px' }}>
+                                <div className="input-group">
+                                    <label>1回あたり時間（分） *</label>
+                                    <input 
+                                        type="number" 
+                                        placeholder="30"
+                                        value={timePerTask}
+                                        onChange={(e) => setTimePerTask(e.target.value)}
+                                    />
+                                </div>
+                                
+                                <div className="input-group">
+                                    <label>頻度 *</label>
+                                    <select value={frequency} onChange={(e) => setFrequency(e.target.value)}>
+                                        <option value="daily">日</option>
+                                        <option value="weekly">週</option>
+                                        <option value="monthly">月</option>
+                                        <option value="yearly">年</option>
+                                    </select>
+                                </div>
+                                
+                                <div className="input-group">
+                                    <label>頻度回数 *</label>
+                                    <input 
+                                        type="number" 
+                                        placeholder="1"
+                                        value={frequencyCount}
+                                        onChange={(e) => setFrequencyCount(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px' }}>
+                                <div className="input-group">
+                                    <label>業務タイプ</label>
+                                    <select value={businessType} onChange={(e) => setBusinessType(e.target.value)}>
+                                        {businessTypes.map(type => (
+                                            <option key={type.value} value={type.value}>
+                                                {type.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                
+                                <div className="input-group">
+                                    <label>業務負荷</label>
+                                    <select value={workload} onChange={(e) => setWorkload(e.target.value)}>
+                                        {workloadLevels.map(level => (
+                                            <option key={level.value} value={level.value}>
+                                                {level.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <button className="button" onClick={addTask}>
+                                ➕ 業務を追加
+                            </button>
+                        </div>
+                    </div>
+
+                    {tasks.length > 0 && (
+                        <div className="section">
+                            <h2 className="section-title">登録済み業務一覧</h2>
+                            <div className="alert alert-success">
+                                年間総業務時間: <strong>{Math.round(totalHours)}時間</strong> 
+                                （正社員の年間業務時間目安: 1,800～2,200時間）
+                            </div>
+                            
+                            <table className="table">
+                                <thead>
+                                    <tr>
+                                        <th>業務名</th>
+                                        <th>1回時間</th>
+                                        <th>頻度</th>
+                                        <th>年間時間</th>
+                                        <th>業務タイプ</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {tasks.map(task => (
+                                        <tr key={task.id}>
+                                            <td>{task.name}</td>
+                                            <td>{task.timePerTask}分</td>
+                                            <td>
+                                                {task.frequencyCount}回/
+                                                {{'daily': '日', 'weekly': '週', 'monthly': '月', 'yearly': '年'}[task.frequency]}
+                                            </td>
+                                            <td>{Math.round(task.hours)}時間</td>
+                                            <td>{businessTypes.find(t => t.value === task.businessType)?.label}</td>
+                                            <td>
+                                                <button 
+                                                    className="button button-danger"
+                                                    style={{ padding: '6px 12px', fontSize: '12px' }}
+                                                    onClick={() => deleteTask(task.id)}
+                                                >
+                                                    削除
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // 問題点診断タブ
+        function ProblemsTab({ selectedProblems, setSelectedProblems }) {
+            const toggleProblem = (problemId) => {
+                if (selectedProblems.includes(problemId)) {
+                    setSelectedProblems(selectedProblems.filter(id => id !== problemId));
+                } else {
+                    setSelectedProblems([...selectedProblems, problemId]);
+                }
+            };
+
+            const mProblems = problems.filter(p => p.type === 'M');
+            const pProblems = problems.filter(p => p.type === 'P');
+            const uProblems = problems.filter(p => p.type === 'U');
+
+            return (
+                <div>
+                    <div className="section">
+                        <h2 className="section-title">問題点診断</h2>
+                        <div className="alert alert-warning">
+                            該当する問題点をチェックしてください。問題点は「M面（業務のやり方）」「P面（担当者のパフォーマンス）」「U面（人材の有効活用度）」の3つの視点で分類されています。
+                        </div>
+                        
+                        <div style={{ marginBottom: '20px', padding: '15px', background: '#dbeafe', borderRadius: '8px' }}>
+                            <strong>選択中の問題点:</strong> {selectedProblems.length}件
+                        </div>
+                    </div>
+
+                    <div className="section">
+                        <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: '#dc2626', marginBottom: '15px' }}>
+                            🔧 M面: Method（業務のやり方）
+                        </h3>
+                        <div className="checkbox-list">
+                            {mProblems.map(problem => (
+                                <div key={problem.id} className="checkbox-item">
+                                    <input 
+                                        type="checkbox"
+                                        id={`problem-${problem.id}`}
+                                        checked={selectedProblems.includes(problem.id)}
+                                        onChange={() => toggleProblem(problem.id)}
+                                    />
+                                    <label htmlFor={`problem-${problem.id}`}>
+                                        {problem.id}. {problem.text}
+                                    </label>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="section">
+                        <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: '#2563eb', marginBottom: '15px' }}>
+                            👤 P面: Performance（担当者のパフォーマンス）
+                        </h3>
+                        <div className="checkbox-list">
+                            {pProblems.map(problem => (
+                                <div key={problem.id} className="checkbox-item">
+                                    <input 
+                                        type="checkbox"
+                                        id={`problem-${problem.id}`}
+                                        checked={selectedProblems.includes(problem.id)}
+                                        onChange={() => toggleProblem(problem.id)}
+                                    />
+                                    <label htmlFor={`problem-${problem.id}`}>
+                                        {problem.id}. {problem.text}
+                                    </label>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="section">
+                        <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: '#059669', marginBottom: '15px' }}>
+                            👥 U面: Utilization（人材の有効活用度）
+                        </h3>
+                        <div className="checkbox-list">
+                            {uProblems.map(problem => (
+                                <div key={problem.id} className="checkbox-item">
+                                    <input 
+                                        type="checkbox"
+                                        id={`problem-${problem.id}`}
+                                        checked={selectedProblems.includes(problem.id)}
+                                        onChange={() => toggleProblem(problem.id)}
+                                    />
+                                    <label htmlFor={`problem-${problem.id}`}>
+                                        {problem.id}. {problem.text}
+                                    </label>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // 自動診断タブ（続き）
+        function AnalysisTab({ tasks, selectedProblems }) {
+            if (tasks.length === 0) {
+                return (
+                    <div className="alert alert-warning">
+                        業務データがありません。「業務棚卸し」タブから業務を登録してください。
+                    </div>
+                );
+            }
+
+            const totalHours = tasks.reduce((sum, task) => sum + task.hours, 0);
+            
+            // 業務タイプ別集計
+            const typeAnalysis = tasks.reduce((acc, task) => {
+                if (!acc[task.businessType]) {
+                    acc[task.businessType] = { count: 0, hours: 0 };
+                }
+                acc[task.businessType].count++;
+                acc[task.businessType].hours += task.hours;
+                return acc;
+            }, {});
+
+            // 業務負荷別集計
+            const workloadAnalysis = tasks.reduce((acc, task) => {
+                if (!acc[task.workload]) {
+                    acc[task.workload] = { count: 0, hours: 0 };
+                }
+                acc[task.workload].count++;
+                acc[task.workload].hours += task.hours;
+                return acc;
+            }, {});
+
+            // 高負荷業務の抽出（上位5件）
+            const highLoadTasks = [...tasks]
+                .sort((a, b) => b.hours - a.hours)
+                .slice(0, 5);
+
+            // 診断結果の生成
+            const diagnostics = [];
+            
+            // 総業務時間の診断
+            if (totalHours < 1800) {
+                diagnostics.push({
+                    level: 'success',
+                    title: '✅ 総業務時間は適正範囲内',
+                    message: `年間${Math.round(totalHours)}時間で、正社員の標準範囲（1,800～2,200時間）を下回っています。余力があるため、新規業務の受入れや、より付加価値の高い業務への注力が可能です。`,
+                    priority: 'low'
+                });
+            } else if (totalHours <= 2200) {
+                diagnostics.push({
+                    level: 'success',
+                    title: '✅ 総業務時間は適正範囲内',
+                    message: `年間${Math.round(totalHours)}時間で、正社員の標準範囲（1,800～2,200時間）内です。現状の業務量は適切ですが、今後の業務増加に備えて効率化を検討しましょう。`,
+                    priority: 'low'
+                });
+            } else if (totalHours <= 2500) {
+                diagnostics.push({
+                    level: 'warning',
+                    title: '⚠️ 業務時間が過大です',
+                    message: `年間${Math.round(totalHours)}時間で、標準範囲を${Math.round(totalHours - 2200)}時間超過しています。慢性的な残業が発生している可能性があります。早急な業務改善が必要です。`,
+                    priority: 'high',
+                    recommendations: [
+                        '高負荷業務の自動化・効率化を検討',
+                        '業務の優先順位付けと廃止・削減の検討',
+                        '業務分担の見直し'
+                    ]
+                });
+            } else {
+                diagnostics.push({
+                    level: 'danger',
+                    title: '🚨 業務時間が大幅に超過',
+                    message: `年間${Math.round(totalHours)}時間で、標準範囲を${Math.round(totalHours - 2200)}時間も超過しています。過重労働のリスクが非常に高い状態です。緊急の対策が必要です。`,
+                    priority: 'critical',
+                    recommendations: [
+                        '即座に業務の棚卸しと廃止・削減を実施',
+                        'RPA等のITツール導入による大幅な自動化',
+                        '業務の外注・アウトソーシングの検討',
+                        '人員増強の検討'
+                    ]
+                });
+            }
+
+            // 業務タイプのバランス診断
+            const routineRatio = (typeAnalysis['routine']?.hours || 0) / totalHours;
+            if (routineRatio > 0.6) {
+                diagnostics.push({
+                    level: 'warning',
+                    title: '⚠️ 定型業務の比率が高い',
+                    message: `定型・繰返し型業務が全体の${Math.round(routineRatio * 100)}%を占めています。自動化・効率化の余地が大きいです。`,
+                    priority: 'high',
+                    recommendations: [
+                        'RPA、マクロ/VBAによる自動化',
+                        'OCRによる紙書類のデータ化',
+                        '現場帳票の電子化'
+                    ]
+                });
+            }
+
+            const judgmentRatio = (typeAnalysis['judgment']?.hours || 0) / totalHours;
+            if (judgmentRatio > 0.4) {
+                diagnostics.push({
+                    level: 'info',
+                    title: '💡 判断型業務の比率が高い',
+                    message: `判断型業務が全体の${Math.round(judgmentRatio * 100)}%を占めています。ノウハウの形式知化が重要です。`,
+                    priority: 'medium',
+                    recommendations: [
+                        '業務マニュアルの整備',
+                        'ルールエンジンによる判断ロジックの自動化',
+                        'チャットボットによるFAQ対応の自動化'
+                    ]
+                });
+            }
+
+            const crossDeptRatio = (typeAnalysis['cross_department']?.hours || 0) / totalHours;
+            if (crossDeptRatio > 0.3) {
+                diagnostics.push({
+                    level: 'warning',
+                    title: '⚠️ 部門横断型業務の比率が高い',
+                    message: `部門横断型業務が全体の${Math.round(crossDeptRatio * 100)}%を占めています。コミュニケーションの非効率が発生している可能性があります。`,
+                    priority: 'high',
+                    recommendations: [
+                        'グループウェア導入による情報共有の効率化',
+                        'ワークフローシステムによる承認プロセスの自動化',
+                        'ノーコード/ローコードアプリによる業務システム構築'
+                    ]
+                });
+            }
+
+            // 業務負荷の診断
+            const heavyRatio = ((workloadAnalysis['heavy']?.hours || 0) + (workloadAnalysis['very_heavy']?.hours || 0)) / totalHours;
+            if (heavyRatio > 0.5) {
+                diagnostics.push({
+                    level: 'warning',
+                    title: '⚠️ 高負荷業務の比率が高い',
+                    message: `重い・非常に重い業務が全体の${Math.round(heavyRatio * 100)}%を占めています。従業員の疲労やストレスが懸念されます。`,
+                    priority: 'high',
+                    recommendations: [
+                        '業務の細分化と分担',
+                        'スキルトレーニングによる負荷軽減',
+                        '判断基準の明確化とマニュアル整備'
+                    ]
+                });
+            }
+
+            // 属人化リスクの診断
+            if (selectedProblems.includes(6)) {
+                diagnostics.push({
+                    level: 'danger',
+                    title: '🚨 業務の属人化リスク',
+                    message: '業務が属人化していると回答されています。特定の担当者に依存する状態は、退職・異動時のリスクが高く、業務継続に支障をきたす可能性があります。',
+                    priority: 'critical',
+                    recommendations: [
+                        '業務マニュアルの作成',
+                        '業務の標準化・可視化',
+                        'OJT体制の整備',
+                        '複数名での業務担当（ダブルアサイン）'
+                    ]
+                });
+            }
+
+            // データ出力機能
+            const exportToCSV = () => {
+                const headers = ['業務名', '1回時間(分)', '頻度', '年間時間(時間)', '業務タイプ', '業務負荷'];
+                const rows = tasks.map(task => [
+                    task.name,
+                    task.timePerTask,
+                    `${task.frequencyCount}回/${{'daily': '日', 'weekly': '週', 'monthly': '月', 'yearly': '年'}[task.frequency]}`,
+                    Math.round(task.hours),
+                    businessTypes.find(t => t.value === task.businessType)?.label,
+                    workloadLevels.find(w => w.value === task.workload)?.label
+                ]);
+
+                const csvContent = [headers, ...rows]
+                    .map(row => row.map(cell => `"${cell}"`).join(','))
+                    .join('\n');
+
+                const bom = '\uFEFF';
+                const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `業務一覧_${new Date().toISOString().split('T')[0]}.csv`;
+                link.click();
+            };
+
+            // 優先度順にソート
+            const sortedDiagnostics = [...diagnostics].sort((a, b) => {
+                const priorityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
+                return priorityOrder[a.priority] - priorityOrder[b.priority];
+            });
+
+            return (
+                <div>
+                    <div className="section">
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                            <h2 className="section-title" style={{ marginBottom: 0 }}>📊 自動診断レポート</h2>
+                            <button className="button button-secondary" onClick={exportToCSV}>
+                                📥 CSV出力
+                            </button>
+                        </div>
+                        
+                        <div className="stats-grid">
+                            <div className="stat-card">
+                                <div className="stat-value">{tasks.length}</div>
+                                <div className="stat-label">総業務数</div>
+                            </div>
+                            <div className="stat-card">
+                                <div className="stat-value">{Math.round(totalHours)}</div>
+                                <div className="stat-label">年間総時間（時間）</div>
+                            </div>
+                            <div className="stat-card">
+                                <div className="stat-value">{selectedProblems.length}</div>
+                                <div className="stat-label">検出された問題点</div>
+                            </div>
+                            <div className="stat-card">
+                                <div className="stat-value">{sortedDiagnostics.length}</div>
+                                <div className="stat-label">診断項目数</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="section">
+                        <h2 className="section-title">🎯 診断結果</h2>
+                        {sortedDiagnostics.map((diag, index) => (
+                            <div 
+                                key={index}
+                                className="card"
+                                style={{
+                                    borderLeft: `4px solid ${
+                                        diag.level === 'danger' ? '#dc2626' :
+                                        diag.level === 'warning' ? '#f59e0b' :
+                                        diag.level === 'success' ? '#10b981' : '#3b82f6'
+                                    }`
+                                }}
+                            >
+                                <h4 style={{ 
+                                    fontSize: '16px', 
+                                    marginBottom: '10px',
+                                    color: diag.level === 'danger' ? '#dc2626' :
+                                           diag.level === 'warning' ? '#f59e0b' :
+                                           diag.level === 'success' ? '#059669' : '#2563eb'
+                                }}>
+                                    {diag.title}
+                                </h4>
+                                <p style={{ fontSize: '14px', lineHeight: '1.6', marginBottom: '10px', color: '#374151' }}>
+                                    {diag.message}
+                                </p>
+                                {diag.recommendations && (
+                                    <div style={{ 
+                                        marginTop: '15px', 
+                                        padding: '15px', 
+                                        background: '#f8fafc', 
+                                        borderRadius: '8px' 
+                                    }}>
+                                        <strong style={{ fontSize: '14px', color: '#1e40af' }}>
+                                            💡 推奨される改善策:
+                                        </strong>
+                                        <ul style={{ marginTop: '8px', marginLeft: '20px' }}>
+                                            {diag.recommendations.map((rec, i) => (
+                                                <li key={i} style={{ fontSize: '14px', lineHeight: '1.8', color: '#374151' }}>
+                                                    {rec}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="section">
+                        <h2 className="section-title">📈 業務タイプ別分析</h2>
+                        <div className="card">
+                            <table className="table">
+                                <thead>
+                                    <tr>
+                                        <th>業務タイプ</th>
+                                        <th>業務数</th>
+                                        <th>年間時間</th>
+                                        <th>割合</th>
+                                        <th>推奨ITツール</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {Object.entries(typeAnalysis).map(([type, data]) => {
+                                        const typeInfo = businessTypes.find(t => t.value === type);
+                                        const ratio = (data.hours / totalHours * 100).toFixed(1);
+                                        const tools = itTools
+                                            .filter(tool => tool.businessType === type)
+                                            .map(tool => tool.name)
+                                            .join(', ');
+                                        
+                                        return (
+                                            <tr key={type}>
+                                                <td>{typeInfo?.label}</td>
+                                                <td>{data.count}件</td>
+                                                <td>{Math.round(data.hours)}時間</td>
+                                                <td>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                        <div style={{ 
+                                                            flex: 1, 
+                                                            height: '20px', 
+                                                            background: '#e5e7eb', 
+                                                            borderRadius: '10px',
+                                                            overflow: 'hidden'
+                                                        }}>
+                                                            <div style={{
+                                                                width: `${ratio}%`,
+                                                                height: '100%',
+                                                                background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)',
+                                                                transition: 'width 0.3s'
+                                                            }} />
+                                                        </div>
+                                                        <span style={{ fontSize: '14px', fontWeight: '600' }}>{ratio}%</span>
+                                                    </div>
+                                                </td>
+                                                <td style={{ fontSize: '12px', color: '#64748b' }}>{tools}</td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div className="section">
+                        <h2 className="section-title">⚡ 業務負荷別分析</h2>
+                        <div className="card">
+                            <table className="table">
+                                <thead>
+                                    <tr>
+                                        <th>負荷レベル</th>
+                                        <th>業務数</th>
+                                        <th>年間時間</th>
+                                        <th>割合</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {Object.entries(workloadAnalysis).map(([level, data]) => {
+                                        const levelInfo = workloadLevels.find(w => w.value === level);
+                                        const ratio = (data.hours / totalHours * 100).toFixed(1);
+                                        
+                                        return (
+                                            <tr key={level}>
+                                                <td>{levelInfo?.label}</td>
+                                                <td>{data.count}件</td>
+                                                <td>{Math.round(data.hours)}時間</td>
+                                                <td>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                        <div style={{ 
+                                                            flex: 1, 
+                                                            height: '20px', 
+                                                            background: '#e5e7eb', 
+                                                            borderRadius: '10px',
+                                                            overflow: 'hidden'
+                                                        }}>
+                                                            <div style={{
+                                                                width: `${ratio}%`,
+                                                                height: '100%',
+                                                                background: level === 'very_heavy' ? '#dc2626' :
+                                                                           level === 'heavy' ? '#f59e0b' :
+                                                                           level === 'normal' ? '#3b82f6' : '#10b981',
+                                                                transition: 'width 0.3s'
+                                                            }} />
+                                                        </div>
+                                                        <span style={{ fontSize: '14px', fontWeight: '600' }}>{ratio}%</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div className="section">
+                        <h2 className="section-title">🔝 高負荷業務トップ5</h2>
+                        <div className="card">
+                            <p style={{ fontSize: '14px', marginBottom: '15px', color: '#64748b' }}>
+                                年間業務時間が多い業務です。優先的に効率化を検討しましょう。
+                            </p>
+                            <table className="table">
+                                <thead>
+                                    <tr>
+                                        <th>順位</th>
+                                        <th>業務名</th>
+                                        <th>年間時間</th>
+                                        <th>業務タイプ</th>
+                                        <th>負荷</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {highLoadTasks.map((task, index) => (
+                                        <tr key={task.id}>
+                                            <td style={{ fontWeight: 'bold', color: '#2563eb' }}>{index + 1}</td>
+                                            <td>{task.name}</td>
+                                            <td style={{ fontWeight: 'bold' }}>{Math.round(task.hours)}時間</td>
+                                            <td>{businessTypes.find(t => t.value === task.businessType)?.label}</td>
+                                            <td>{workloadLevels.find(w => w.value === task.workload)?.label}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // ITツール推奨タブ
+        function ToolsTab({ tasks }) {
+            const businessTypeCounts = tasks.reduce((acc, task) => {
+                acc[task.businessType] = (acc[task.businessType] || 0) + 1;
+                return acc;
+            }, {});
+
+            const recommendedTools = itTools.filter(tool => {
+                return tasks.some(task => task.businessType === tool.businessType);
+            });
+
+            return (
+                <div>
+                    <div className="section">
+                        <h2 className="section-title">業務タイプ別分析</h2>
+                        <div className="stats-grid">
+                            {businessTypes.map(type => (
+                                <div key={type.value} className="stat-card">
+                                    <div className="stat-value">{businessTypeCounts[type.value] || 0}</div>
+                                    <div className="stat-label">{type.label}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="section">
+                        <h2 className="section-title">推奨ITツール</h2>
+                        {recommendedTools.length === 0 ? (
+                            <div className="alert alert-warning">
+                                業務を登録すると、業務タイプに応じたITツールを推奨します。<br />
+                                「業務棚卸し」タブから業務を登録してください。
+                            </div>
+                        ) : (
+                            recommendedTools.map((tool, index) => (
+                                <div key={index} className="tool-recommendation">
+                                    <h4>
+                                        🛠️ {tool.name}
+                                        <span style={{ fontSize: '12px', marginLeft: '10px', fontWeight: 'normal', color: '#92400e' }}>
+                                            （対象: {businessTypes.find(t => t.value === tool.businessType)?.label}）
+                                        </span>
+                                    </h4>
+                                    <p>{tool.description}</p>
+                                    <div style={{ marginTop: '10px' }}>
+                                        <strong style={{ fontSize: '13px' }}>導入効果:</strong>
+                                        <ul style={{ marginTop: '5px', marginLeft: '20px' }}>
+                                            {tool.benefits.map((benefit, i) => (
+                                                <li key={i} style={{ fontSize: '13px', lineHeight: '1.6' }}>{benefit}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+
+                    <div className="section">
+                        <h2 className="section-title">全ITツール一覧</h2>
+                        {itTools.map((tool, index) => (
+                            <div key={index} className="card">
+                                <h4 style={{ color: '#1e40af', marginBottom: '10px' }}>
+                                    {tool.name}
+                                    <span style={{ fontSize: '12px', marginLeft: '10px', fontWeight: 'normal', color: '#64748b' }}>
+                                        （{businessTypes.find(t => t.value === tool.businessType)?.label}向け）
+                                    </span>
+                                </h4>
+                                <p style={{ fontSize: '14px', lineHeight: '1.6', color: '#374151', marginBottom: '10px' }}>
+                                    {tool.description}
+                                </p>
+                                <div>
+                                    <strong style={{ fontSize: '13px' }}>導入効果:</strong>
+                                    <div style={{ marginTop: '5px', display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                                        {tool.benefits.map((benefit, i) => (
+                                            <span key={i} style={{ 
+                                                fontSize: '12px', 
+                                                background: '#dbeafe', 
+                                                padding: '4px 8px', 
+                                                borderRadius: '4px',
+                                                color: '#1e40af'
+                                            }}>
+                                                {benefit}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        // 改善計画タブ
+        function PlanTab({ improvements, setImprovements, selectedProblems }) {
+            const [improvementTitle, setImprovementTitle] = useState('');
+            const [currentSituation, setCurrentSituation] = useState('');
+            const [targetSituation, setTargetSituation] = useState('');
+            const [actions, setActions] = useState('');
+            const [deadline, setDeadline] = useState('');
+
+            const addImprovement = () => {
+                if (!improvementTitle || !currentSituation || !targetSituation) {
+                    alert('必須項目を入力してください');
+                    return;
+                }
+
+                const newImprovement = {
+                    id: Date.now(),
+                    title: improvementTitle,
+                    currentSituation,
+                    targetSituation,
+                    actions,
+                    deadline,
+                    status: 'planning',
+                    createdAt: new Date().toLocaleDateString('ja-JP')
+                };
+
+                setImprovements([...improvements, newImprovement]);
+                
+                // フォームをリセット
+                setImprovementTitle('');
+                setCurrentSituation('');
+                setTargetSituation('');
+                setActions('');
+                setDeadline('');
+            };
+
+            const deleteImprovement = (id) => {
+                if (confirm('この改善計画を削除してもよろしいですか？')) {
+                    setImprovements(improvements.filter(imp => imp.id !== id));
+                }
+            };
+
+            const updateStatus = (id, newStatus) => {
+                setImprovements(improvements.map(imp => 
+                    imp.id === id ? { ...imp, status: newStatus } : imp
+                ));
+            };
+
+            const selectedProblemDetails = problems.filter(p => selectedProblems.includes(p.id));
+
+            return (
+                <div>
+                    {selectedProblems.length > 0 && (
+                        <div className="section">
+                            <h2 className="section-title">特定された問題点</h2>
+                            <div className="card">
+                                <p style={{ fontSize: '14px', marginBottom: '10px', color: '#64748b' }}>
+                                    以下の問題点が特定されています。これらに対する改善計画を立案しましょう。
+                                </p>
+                                <ul style={{ marginLeft: '20px' }}>
+                                    {selectedProblemDetails.map(problem => (
+                                        <li key={problem.id} style={{ fontSize: '14px', lineHeight: '1.8', color: '#374151' }}>
+                                            {problem.text}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="section">
+                        <h2 className="section-title">改善計画の登録</h2>
+                        <div className="card">
+                            <div className="input-group">
+                                <label>改善テーマ *</label>
+                                <input 
+                                    type="text" 
+                                    placeholder="例：RPA導入による月次報告書作成の自動化"
+                                    value={improvementTitle}
+                                    onChange={(e) => setImprovementTitle(e.target.value)}
+                                />
+                            </div>
+
+                            <div className="input-group">
+                                <label>現状 *</label>
+                                <textarea 
+                                    placeholder="現在の問題点や課題を記入してください"
+                                    value={currentSituation}
+                                    onChange={(e) => setCurrentSituation(e.target.value)}
+                                />
+                            </div>
+
+                            <div className="input-group">
+                                <label>目標 *</label>
+                                <textarea 
+                                    placeholder="改善後の目標状態を記入してください"
+                                    value={targetSituation}
+                                    onChange={(e) => setTargetSituation(e.target.value)}
+                                />
+                            </div>
+
+                            <div className="input-group">
+                                <label>実施アクション</label>
+                                <textarea 
+                                    placeholder="具体的な改善施策を記入してください"
+                                    value={actions}
+                                    onChange={(e) => setActions(e.target.value)}
+                                />
+                            </div>
+
+                            <div className="input-group">
+                                <label>期限</label>
+                                <input 
+                                    type="date"
+                                    value={deadline}
+                                    onChange={(e) => setDeadline(e.target.value)}
+                                />
+                            </div>
+
+                            <button className="button" onClick={addImprovement}>
+                                ➕ 改善計画を追加
+                            </button>
+                        </div>
+                    </div>
+
+                    {improvements.length > 0 && (
+                        <div className="section">
+                            <h2 className="section-title">登録済み改善計画</h2>
+                            {improvements.map(improvement => (
+                                <div key={improvement.id} className="card">
+                                    <div className="card-header">
+                                        <h3 className="card-title">{improvement.title}</h3>
+                                        <div className="button-group">
+                                            <select 
+                                                value={improvement.status}
+                                                onChange={(e) => updateStatus(improvement.id, e.target.value)}
+                                                style={{ 
+                                                    padding: '6px 12px', 
+                                                    borderRadius: '6px', 
+                                                    border: '2px solid #e5e7eb',
+                                                    fontSize: '12px'
+                                                }}
+                                            >
+                                                <option value="planning">計画中</option>
+                                                <option value="in_progress">実施中</option>
+                                                <option value="completed">完了</option>
+                                            </select>
+                                            <button 
+                                                className="button button-danger"
+                                                style={{ padding: '6px 12px', fontSize: '12px' }}
+                                                onClick={() => deleteImprovement(improvement.id)}
+                                            >
+                                                削除
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '15px' }}>
+                                        登録日: {improvement.createdAt}
+                                        {improvement.deadline && ` | 期限: ${improvement.deadline}`}
+                                    </div>
+
+                                    <div style={{ marginBottom: '10px' }}>
+                                        <strong style={{ fontSize: '14px', color: '#1e40af' }}>現状:</strong>
+                                        <p style={{ fontSize: '14px', lineHeight: '1.6', marginTop: '5px', color: '#374151' }}>
+                                            {improvement.currentSituation}
+                                        </p>
+                                    </div>
+
+                                    <div style={{ marginBottom: '10px' }}>
+                                        <strong style={{ fontSize: '14px', color: '#059669' }}>目標:</strong>
+                                        <p style={{ fontSize: '14px', lineHeight: '1.6', marginTop: '5px', color: '#374151' }}>
+                                            {improvement.targetSituation}
+                                        </p>
+                                    </div>
+
+                                    {improvement.actions && (
+                                        <div>
+                                            <strong style={{ fontSize: '14px', color: '#7c3aed' }}>実施アクション:</strong>
+                                            <p style={{ fontSize: '14px', lineHeight: '1.6', marginTop: '5px', color: '#374151' }}>
+                                                {improvement.actions}
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // アプリをレンダリング
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
